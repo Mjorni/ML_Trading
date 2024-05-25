@@ -1,2 +1,3 @@
 # ML_Trading
-  <b>ml trading on stock</b>
+<h1 align = 'center'>ml trading on stock</h1>
+  
