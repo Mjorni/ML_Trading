@@ -11,5 +11,5 @@
 - Keras
 
 # Для решения задачи было решено использовать рекурентные нейронные сети, в частности слой: LSTM
-<img src = "https://www.mdpi.com/sensors/sensors-20-01979/article_deploy/html/images/sensors-20-01979-g001.png" width="400" height="400">
+<img src = "https://www.mdpi.com/sensors/sensors-20-01979/article_deploy/html/images/sensors-20-01979-g001.png" width="400" height="600">
   
