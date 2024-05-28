@@ -1,6 +1,6 @@
 # ML_Trading
 <h1 align = 'center'>ml trading on stock</h1>
-Данная нейронная сеть берет датасет с сайта: [YahooFinance](https://finance.yahoo.com/) и предсказывает рост цены котировок.
+Данная нейронная сеть берет датасет с сайта: YahooFinance(https://finance.yahoo.com/) и предсказывает рост цены котировок.
 
 # В данной работе использовались следующие библиотеки:
 - Pandas
