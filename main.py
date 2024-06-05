@@ -13,7 +13,6 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Dense, LSTM, Dropout, Activation # type: ignore
 from threading import Thread
-import nkot
 
 root = Tk()
 root.title("PokoAI")
@@ -38,7 +37,7 @@ def get_previev():
     """Функция отображения графа"""
     global df
     df = pd.read_csv(file_path, parse_dates=["Date"])
-
+    df = preproc(df)
     ax.plot(df[["Open", "Close", "Low", "High"]], label = ["Open", "Close", "Low", "High"], linewidth = 0.5)
     ax.legend()
 
@@ -46,7 +45,16 @@ def get_previev():
     canvas.get_tk_widget().pack(side = LEFT)
     get_all_col([column for column in df.drop(['Date', 'Adj Close'], axis = 1)])
 
-
+def preproc(df):
+    "Предподготовка датафрейма"
+    df.info()
+    if df.isnull().sum().any():
+        df = df.dropna(how = "any")
+        print("Удалил все строки с пропуски")
+        return df
+    else:
+        return df
+      
 def get_all_col(df):
     """отображение кнопок с названиями столбцов """
     choise_entry.pack(anchor = N)
@@ -54,15 +62,17 @@ def get_all_col(df):
     new_plot.pack(anchor = N)
     for i in df:
         butt = ttk.Button(text = i, command = lambda x = i:choise_coll(x))
-        butt.pack(anchor = N)
+        butt.pack(anchor = N, pady = 5)
     
 
 def choise_coll(comm):
+    "Обновление текстового поля"
     choise_entry.delete(0, END)
     choise_entry.insert(0, comm)
     
 
 def new_graph():
+    "Обновление рисунка"
     canvas.get_tk_widget().pack_forget()
     ax.clear()
     print(df[choise_entry.get()])
@@ -77,7 +87,7 @@ def new_graph():
 butt_choise_file = ttk.Button(root, text = "Выбрать файл", command=get_path_to_file)
 butt_choise_file.pack(anchor = NW, padx = 10, pady = 10)
 
-butt_start = ttk.Button(root, text = "Начать обучение", command = get_previev)
+butt_start = ttk.Button(root, text = "Выбираю этот файл!", command = get_previev)
 butt_start.pack(anchor = NW, padx = 10)
 
 
@@ -89,7 +99,7 @@ choise_entry = ttk.Entry(root, width = 23)
 fig = plt.figure(figsize=(8, 6), dpi = 100)
 ax = fig.add_subplot()
 canvas = FigureCanvasTkAgg(fig, master = root) #холст
-new_plot = ttk.Button(root, text = "Отобразить новый график", command = new_graph)
+new_plot = ttk.Button(root, text = "Отобразить новый график", width = 25, command = new_graph)
 
 
 
@@ -118,8 +128,9 @@ def start_train():
     
 
 def get_res(x_train, y_train, x_test, y_test):
+    "Обучение модели на выбранных данных"
     x_train = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
-    history = model.fit(x_train, y_train, epochs = 5, shuffle=False)
+    history = model.fit(x_train, y_train, epochs = 50, shuffle=False)
     model.evaluate(x_test, y_test)
     result_predict = model.predict(x_test)
     canvas.get_tk_widget().pack_forget()
@@ -151,6 +162,6 @@ def xyarray(data):
 
 
 
-btt_start_train = ttk.Button(root, text = "Начать обучение", command = start_train)
+btt_start_train = ttk.Button(root, text = "Начать обучение", width = 25,  command = start_train)
 
 root.mainloop()
