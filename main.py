@@ -12,7 +12,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Dense, LSTM, Dropout, Activation # type: ignore
-from threading import Thread
+
 
 root = Tk()
 root.title("PokoAI")
@@ -24,7 +24,8 @@ df = None
 def get_path_to_file():
     """Запись пути до выбранного файла"""
     global file_path
-    file_path = askopenfilename(title = "Необходимо выбрать csv файл", filetypes = [("CSV files", "*.csv")])
+    file_path = askopenfilename(title = "Необходимо выбрать csv файл", 
+                                filetypes = [("CSV files", "*.csv")])
     text_path.delete(0, END)
     if file_path:
         text_path.insert(0, file_path)
@@ -38,12 +39,15 @@ def get_previev():
     global df
     df = pd.read_csv(file_path, parse_dates=["Date"])
     df = preproc(df)
-    ax.plot(df[["Open", "Close", "Low", "High"]], label = ["Open", "Close", "Low", "High"], linewidth = 0.5)
+    ax.plot(df[["Open", "Close", "Low", "High"]], 
+            label = ["Open", "Close", "Low", "High"], 
+            linewidth = 0.5)
     ax.legend()
 
     canvas.draw()
     canvas.get_tk_widget().pack(side = LEFT)
-    get_all_col([column for column in df.drop(['Date', 'Adj Close'], axis = 1)])
+    get_all_col([column for column in 
+                 df.drop(['Date', 'Adj Close'], axis = 1)])
 
 def preproc(df):
     "Предподготовка датафрейма"
@@ -61,7 +65,8 @@ def get_all_col(df):
     btt_start_train.pack(anchor = N)
     new_plot.pack(anchor = N)
     for i in df:
-        butt = ttk.Button(text = i, command = lambda x = i:choise_coll(x))
+        butt = ttk.Button(text = i, 
+                          command = lambda x = i:choise_coll(x))
         butt.pack(anchor = N, pady = 5)
     
 
@@ -84,12 +89,18 @@ def new_graph():
     canvas.get_tk_widget().pack(side = LEFT)
 
 
-butt_choise_file = ttk.Button(root, text = "Выбрать файл", command=get_path_to_file)
+butt_choise_file = ttk.Button(root, text = "Выбрать файл", 
+                              command=get_path_to_file)
 butt_choise_file.pack(anchor = NW, padx = 10, pady = 10)
 
-butt_start = ttk.Button(root, text = "Выбираю этот файл!", command = get_previev)
+butt_start = ttk.Button(root, text = "Выбираю этот файл!",
+                         command = get_previev)
 butt_start.pack(anchor = NW, padx = 10)
 
+from logg import new_win
+butt_start = ttk.Button(root, text = "Авторизация",
+                         command = new_win)
+butt_start.pack(anchor = NE, padx = 10)
 
 text_path = ttk.Entry(root, width = 75)
 text_path.pack(anchor = NW, padx = 10, pady = 10)
@@ -99,7 +110,10 @@ choise_entry = ttk.Entry(root, width = 23)
 fig = plt.figure(figsize=(8, 6), dpi = 100)
 ax = fig.add_subplot()
 canvas = FigureCanvasTkAgg(fig, master = root) #холст
-new_plot = ttk.Button(root, text = "Отобразить новый график", width = 25, command = new_graph)
+
+new_plot = ttk.Button(root, 
+                      text = "Отобразить новый график", 
+                      width = 25, command = new_graph)
 
 
 
@@ -113,7 +127,9 @@ model = Sequential([
             Dense(1)
         ])
 model.compile(optimizer = 'adam', loss = 'mse')
-import tracemalloc
+
+
+#import tracemalloc
 
 #   Разделение данных на тестовые и тренеровочные
 def start_train():
@@ -123,7 +139,12 @@ def start_train():
 
     x_train, x_test = x[:int(x.shape[0] * val)], x[int(x.shape[0] * val):]
     y_train, y_test = y[:int(x.shape[0] * val)], y[int(x.shape[0] * val):]
-    print(f"x train -> {x_train.shape}  \ny train -> {y_train.shape}  \nx test  -> {x_test.shape} \ny test  -> {y_test.shape}")
+    
+    print(f"""x train -> {x_train.shape}  
+          \ny train -> {y_train.shape}  
+          \nx test  -> {x_test.shape} 
+          \ny test  -> {y_test.shape}""")
+    
     get_res(x_train, y_train, x_test, y_test)
     
 
