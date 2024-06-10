@@ -61,7 +61,7 @@ def new_win():
             print("+")
             text_on_notes = note_entry.get("1.0","end-1c")
             print(text_on_notes)
-            with open('note.txt', 'r+') as f:
+            with open('note.txt', 'w') as f:
                 f.write("".join(text_on_notes))
         else:
             print("-")
