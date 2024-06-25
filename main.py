@@ -10,6 +10,8 @@ from matplotlib.figure import Figure
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Dense, LSTM, Dropout, Activation # type: ignore
 
@@ -63,6 +65,7 @@ def get_all_col(df):
     """отображение кнопок с названиями столбцов """
     choise_entry.pack(anchor = N)
     btt_start_train.pack(anchor = N)
+    btt_test.pack(anchor = N)
     new_plot.pack(anchor = N)
     for i in df:
         butt = ttk.Button(text = i, 
@@ -151,7 +154,8 @@ def start_train():
 def get_res(x_train, y_train, x_test, y_test):
     "Обучение модели на выбранных данных"
     x_train = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
-    history = model.fit(x_train, y_train, epochs = 50, shuffle=False)
+    model.fit(x_train, y_train, epochs = 50, shuffle=False)
+    model.save("saved_model")
     model.evaluate(x_test, y_test)
     result_predict = model.predict(x_test)
     canvas.get_tk_widget().pack_forget()
@@ -182,7 +186,35 @@ def xyarray(data):
     return np.array(x), np.array(y)
 
 
+def test():
+    df_test = pd.read_csv("AAPL.csv", parse_dates=["Date"])
+    df_test = preproc(df_test)
+    canvas.get_tk_widget().pack_forget()
+    ax.clear()
+    new_model = tf.keras.models.load_model('saved_model')
+    df_test = df_test[choise_entry.get()]
+    scale_col = MinMaxScaler()
+    x_for_test = df_test.astype('float')
+    scale_col.fit(x_for_test.values.reshape(-1, 1))
+    x_for_test = scale_col.transform(x_for_test.values.reshape(-1, 1))
+    print(x_for_test)
+    y_for_test = new_model.predict(x_for_test)
+    print(len(y_for_test))
+    ax.plot(y_for_test, label = 'Предсказанные данные')
+    df_test_v = df_test.astype('float')
+    scale_col.fit(df_test_v.values.reshape(-1, 1))
+    df_test_v = scale_col.transform(df_test_v.values.reshape(-1, 1))
+    print(df_test_v == y_for_test)
+    print(df_test_v)
+
+    plt.title(choise_entry.get())
+    ax.plot(df_test_v, label = 'Данные за июнь 2024')
+    ax.legend()
+    canvas.draw()
+    canvas.get_tk_widget().pack(side = LEFT)
 
 btt_start_train = ttk.Button(root, text = "Начать обучение", width = 25,  command = start_train)
+btt_test = ttk.Button(root, text = "Проверка", width = 25,  command = test)
+
 
 root.mainloop()
